@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500">
+  <g fill="none" stroke="#948d7a" stroke-width="1">
+    <rect x="14" y="14" width="372" height="472" />
+    <rect x="22" y="22" width="356" height="456" opacity="0.45" />
+  </g>
+  <g fill="none" stroke="#948d7a" stroke-width="2">
+    <rect x="140" y="84" width="120" height="14" />
+    <path d="M152 100 Q 200 92 248 100" />
+    <circle cx="150" cy="114" r="15" />
+    <circle cx="150" cy="114" r="7" />
+    <circle cx="150" cy="114" r="2" fill="#948d7a" />
+    <circle cx="250" cy="114" r="15" />
+    <circle cx="250" cy="114" r="7" />
+    <circle cx="250" cy="114" r="2" fill="#948d7a" />
+    <path d="M165 112 Q 200 104 235 112" />
+    <path d="M168 128 L 162 380 L 238 380 L 232 128 Z" />
+    <path d="M182 128 L 178 380" opacity="0.7" />
+    <path d="M196 128 L 194 380" opacity="0.7" />
+    <path d="M210 128 L 212 380" opacity="0.7" />
+    <path d="M224 128 L 228 380" opacity="0.7" />
+    <rect x="154" y="382" width="92" height="10" />
+    <rect x="146" y="392" width="108" height="10" />
+    <rect x="136" y="402" width="128" height="12" />
+    <rect x="126" y="414" width="148" height="12" />
+  </g>
+  <g stroke="#948d7a" stroke-width="1" opacity="0.5">
+    <path d="M126 440 L 274 440" />
+    <path d="M112 446 L 288 446" />
+  </g>
+  <text x="200" y="472" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="15" fill="#948d7a">Plate II &#8212; The Column</text>
+</svg>
