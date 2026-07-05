@@ -1,154 +1,157 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="dark light" />
-    <title>Shakespeare — a browser book reader</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='4' y='25' font-family='Georgia,serif' font-size='26' fill='%23c2a878'%3ES%3C/text%3E%3C/svg%3E" />
-  </head>
-  <body>
-    <!-- ———— Front page ———— -->
-    <div id="home" class="home">
-      <section class="home-intro">
-        <p class="home-tagline">&ldquo;All the world&rsquo;s a page.&rdquo;&ensp;<span class="fleuron">&#10086;</span></p>
-        <p class="home-blurb">
-          A quiet reading room in your browser. Upload a book &mdash;
-          <abbr>EPUB</abbr> or <abbr>PDF</abbr> &mdash; and Shakespeare
-          remembers where you left off. Nothing leaves your machine.
-        </p>
-      </section>
 
-      <figure class="home-art">
-        <img id="gallery-img" alt="Decorative plate" />
-        <figcaption>Image for viewing pleasure</figcaption>
-      </figure>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <title>Shakespeare — a browser book reader</title>
+  <link rel="icon" href="/src/assets/gallery/Shakespeare, William.png" type="image/png">
+</head>
 
-      <div class="home-foot">
-        <nav class="home-actions" aria-label="Main actions">
-          <button type="button" class="linklike" id="btn-settings">Settings</button>
-          <button type="button" class="linklike" id="btn-upload">Upload</button>
-          <button type="button" class="linklike" id="btn-library" hidden>Library</button>
-        </nav>
-        <p class="home-resume" id="home-resume" hidden>
-          <button type="button" class="linklike" id="btn-resume"></button>
-        </p>
-        <p class="home-status" id="home-status" role="status"></p>
-        <h1 class="home-title" aria-label="Shakespeare">Shakespeare</h1>
-      </div>
+<body>
+  <!-- ———— Front page ———— -->
+  <div id="home" class="home">
+    <section class="home-intro">
+      <p class="home-tagline">&ldquo;All the world&rsquo;s a page.&rdquo;&ensp;<span class="fleuron">&#10086;</span></p>
+      <p class="home-blurb">
+        A quiet reading room in your browser. Upload a book &mdash;
+        <abbr>EPUB</abbr> or <abbr>PDF</abbr> &mdash; and Shakespeare
+        remembers where you left off. Nothing leaves your machine.
+      </p>
+    </section>
 
-      <input
-        type="file"
-        id="file-input"
-        accept=".epub,.pdf,application/epub+zip,application/pdf"
-        hidden
-      />
-      <div class="dropveil" id="dropveil" hidden><span>Let fall thy book</span></div>
+    <figure class="home-art">
+      <img id="gallery-img" alt="" />
+      <figcaption>
+        <a id="gallery-caption" target="_blank" rel="noopener noreferrer" title="Open on Wikipedia"></a>
+      </figcaption>
+    </figure>
+
+    <div class="home-foot">
+      <nav class="home-actions" aria-label="Main actions">
+        <button type="button" class="linklike" id="btn-settings">Settings</button>
+        <button type="button" class="linklike" id="btn-upload">Upload</button>
+        <button type="button" class="linklike" id="btn-library" hidden>Library</button>
+      </nav>
+      <p class="home-resume" id="home-resume" hidden>
+        <button type="button" class="linklike" id="btn-resume"></button>
+      </p>
+      <p class="home-status" id="home-status" role="status"></p>
+      <h1 class="home-title" aria-label="Shakespeare">Shakespeare</h1>
     </div>
 
-    <!-- ———— Reader ———— -->
-    <div id="reader" class="reader" hidden>
-      <header class="reader-bar">
-        <button type="button" class="linklike reader-home" id="btn-close-reader">&larr; Shakespeare</button>
-        <span class="reader-booktitle" id="reader-booktitle"></span>
-        <nav class="reader-nav">
-          <button type="button" class="linklike" id="btn-reader-settings">Settings</button>
-          <button type="button" class="linklike" id="btn-toc" aria-expanded="true">Contents</button>
-        </nav>
+    <p class="home-colophon" id="colophon"></p>
+
+    <input type="file" id="file-input" accept=".epub,.pdf,application/epub+zip,application/pdf" hidden />
+    <div class="dropveil" id="dropveil" hidden><span>Let fall thy book</span></div>
+  </div>
+
+  <!-- ———— Reader ———— -->
+  <div id="reader" class="reader" hidden>
+    <header class="reader-bar">
+      <button type="button" class="linklike reader-home" id="btn-close-reader">&larr; Shakespeare</button>
+      <span class="reader-booktitle" id="reader-booktitle"></span>
+      <nav class="reader-nav">
+        <button type="button" class="linklike" id="btn-reader-settings">Settings</button>
+        <button type="button" class="linklike" id="btn-toc" aria-expanded="true">Contents</button>
+      </nav>
+    </header>
+
+    <div class="reader-body">
+      <main class="viewer-wrap" id="viewer-wrap">
+        <div id="viewer"></div>
+        <button type="button" class="page-arrow page-arrow-prev" id="nav-prev"
+          aria-label="Previous page">&lsaquo;</button>
+        <button type="button" class="page-arrow page-arrow-next" id="nav-next" aria-label="Next page">&rsaquo;</button>
+        <div class="viewer-loading" id="viewer-loading" hidden><span>Opening&hellip;</span></div>
+      </main>
+
+      <aside class="toc-panel" id="toc-panel" aria-label="Book contents">
+        <h2 class="toc-heading">Contents</h2>
+        <nav class="toc-list" id="toc-list"></nav>
+      </aside>
+    </div>
+
+    <div class="progress" id="progress">
+      <div class="progress-info">
+        <span class="progress-label" id="progress-label"></span>
+        <span class="progress-pct" id="progress-pct"></span>
+      </div>
+      <div class="progress-track" id="progress-track" title="Jump to position">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ———— Settings overlay ———— -->
+  <div class="overlay" id="settings-overlay" hidden>
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="panel-head">
+        <h2 id="settings-title">Settings</h2>
+        <button type="button" class="linklike panel-close" data-close aria-label="Close">&times;</button>
       </header>
 
-      <div class="reader-body">
-        <main class="viewer-wrap" id="viewer-wrap">
-          <div id="viewer"></div>
-          <button type="button" class="page-arrow page-arrow-prev" id="nav-prev" aria-label="Previous page">&lsaquo;</button>
-          <button type="button" class="page-arrow page-arrow-next" id="nav-next" aria-label="Next page">&rsaquo;</button>
-          <div class="viewer-loading" id="viewer-loading" hidden><span>Opening&hellip;</span></div>
-        </main>
-
-        <aside class="toc-panel" id="toc-panel" aria-label="Book contents">
-          <h2 class="toc-heading">Contents</h2>
-          <nav class="toc-list" id="toc-list"></nav>
-        </aside>
-      </div>
-
-      <div class="progress" id="progress">
-        <div class="progress-info">
-          <span class="progress-label" id="progress-label"></span>
-          <span class="progress-pct" id="progress-pct"></span>
+      <section class="setting">
+        <h3>Theme</h3>
+        <div class="choice-row" id="set-theme">
+          <button type="button" data-value="dark">Dark</button>
+          <button type="button" data-value="light">Light</button>
         </div>
-        <div class="progress-track" id="progress-track" title="Jump to position">
-          <div class="progress-fill" id="progress-fill"></div>
+      </section>
+
+      <section class="setting">
+        <h3>Text size</h3>
+        <div class="choice-row stepper" id="set-fontsize">
+          <button type="button" data-step="-1" aria-label="Smaller text">&minus;</button>
+          <span class="stepper-value" id="fontsize-value">100%</span>
+          <button type="button" data-step="1" aria-label="Larger text">+</button>
         </div>
-      </div>
+      </section>
+
+      <section class="setting">
+        <h3>Text style</h3>
+        <div class="choice-row" id="set-font">
+          <button type="button" data-value="garamond" style="font-family: var(--stack-garamond)">Garamond</button>
+          <button type="button" data-value="georgia" style="font-family: var(--stack-georgia)">Georgia</button>
+          <button type="button" data-value="sans" style="font-family: var(--stack-sans)">Sans</button>
+        </div>
+      </section>
+
+      <section class="setting">
+        <h3>Layout</h3>
+        <div class="choice-row" id="set-layout">
+          <button type="button" data-value="single">One page</button>
+          <button type="button" data-value="double">Two pages</button>
+          <button type="button" data-value="scroll">Scroll</button>
+        </div>
+      </section>
+
+      <section class="setting">
+        <h3>PDF in dark theme</h3>
+        <div class="choice-row" id="set-pdfinvert">
+          <button type="button" data-value="true">Inverted</button>
+          <button type="button" data-value="false">As printed</button>
+        </div>
+      </section>
+
+      <p class="panel-note">Text size &amp; style apply to EPUB books; PDF pages keep their print layout.</p>
     </div>
+  </div>
 
-    <!-- ———— Settings overlay ———— -->
-    <div class="overlay" id="settings-overlay" hidden>
-      <div class="panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-        <header class="panel-head">
-          <h2 id="settings-title">Settings</h2>
-          <button type="button" class="linklike panel-close" data-close aria-label="Close">&times;</button>
-        </header>
-
-        <section class="setting">
-          <h3>Theme</h3>
-          <div class="choice-row" id="set-theme">
-            <button type="button" data-value="dark">Dark</button>
-            <button type="button" data-value="light">Light</button>
-          </div>
-        </section>
-
-        <section class="setting">
-          <h3>Text size</h3>
-          <div class="choice-row stepper" id="set-fontsize">
-            <button type="button" data-step="-1" aria-label="Smaller text">&minus;</button>
-            <span class="stepper-value" id="fontsize-value">100%</span>
-            <button type="button" data-step="1" aria-label="Larger text">+</button>
-          </div>
-        </section>
-
-        <section class="setting">
-          <h3>Text style</h3>
-          <div class="choice-row" id="set-font">
-            <button type="button" data-value="garamond" style="font-family: var(--stack-garamond)">Garamond</button>
-            <button type="button" data-value="georgia" style="font-family: var(--stack-georgia)">Georgia</button>
-            <button type="button" data-value="sans" style="font-family: var(--stack-sans)">Sans</button>
-          </div>
-        </section>
-
-        <section class="setting">
-          <h3>Layout</h3>
-          <div class="choice-row" id="set-layout">
-            <button type="button" data-value="single">One page</button>
-            <button type="button" data-value="double">Two pages</button>
-            <button type="button" data-value="scroll">Scroll</button>
-          </div>
-        </section>
-
-        <section class="setting">
-          <h3>PDF in dark theme</h3>
-          <div class="choice-row" id="set-pdfinvert">
-            <button type="button" data-value="true">Inverted</button>
-            <button type="button" data-value="false">As printed</button>
-          </div>
-        </section>
-
-        <p class="panel-note">Text size &amp; style apply to EPUB books; PDF pages keep their print layout.</p>
-      </div>
+  <!-- ———— Library overlay ———— -->
+  <div class="overlay" id="library-overlay" hidden>
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="library-title">
+      <header class="panel-head">
+        <h2 id="library-title">Library</h2>
+        <button type="button" class="linklike panel-close" data-close aria-label="Close">&times;</button>
+      </header>
+      <ul class="library-list" id="library-list"></ul>
+      <p class="panel-note">Books are kept in this browser only, along with your reading position.</p>
     </div>
+  </div>
 
-    <!-- ———— Library overlay ———— -->
-    <div class="overlay" id="library-overlay" hidden>
-      <div class="panel" role="dialog" aria-modal="true" aria-labelledby="library-title">
-        <header class="panel-head">
-          <h2 id="library-title">Library</h2>
-          <button type="button" class="linklike panel-close" data-close aria-label="Close">&times;</button>
-        </header>
-        <ul class="library-list" id="library-list"></ul>
-        <p class="panel-note">Books are kept in this browser only, along with your reading position.</p>
-      </div>
-    </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
 
-    <script type="module" src="/src/main.js"></script>
-  </body>
 </html>

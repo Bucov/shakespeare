@@ -21,7 +21,7 @@ import {
   deleteBook,
   patchBook,
 } from './storage.js';
-import { randomImage } from './gallery.js';
+import { randomArtwork } from './gallery.js';
 import { EpubReader } from './reader/epub-reader.js';
 import { PdfReader } from './reader/pdf-reader.js';
 
@@ -59,10 +59,19 @@ function setStatus(text, sticky = false) {
 }
 
 function initGallery() {
-  const url = randomImage();
+  const art = randomArtwork();
   const img = $('#gallery-img');
-  if (url) img.src = url;
-  else img.closest('.home-art').hidden = true;
+  if (!art) {
+    img.closest('.home-art').hidden = true;
+    return;
+  }
+  img.src = art.url;
+  img.alt = art.title;
+  const caption = $('#gallery-caption');
+  caption.href = art.wiki;
+  const cite = document.createElement('cite');
+  cite.textContent = art.title;
+  caption.replaceChildren(cite, document.createTextNode(` — ${art.artist}`));
 }
 
 async function refreshHome() {
@@ -414,7 +423,13 @@ async function renderLibrary() {
     const progress = getProgress(book.id);
     const pct = progress?.fraction != null ? `${Math.round(progress.fraction * 100)}% read` : 'unread';
     meta.textContent = `${book.kind.toUpperCase()} · ${pct}`;
-    open.append(title, meta);
+    const track = document.createElement('span');
+    track.className = 'lib-progress';
+    const fill = document.createElement('span');
+    fill.className = 'lib-progress-fill';
+    fill.style.width = `${Math.round((progress?.fraction || 0) * 100)}%`;
+    track.appendChild(fill);
+    open.append(title, meta, track);
     open.addEventListener('click', async () => {
       closeOverlay('#library-overlay');
       const record = await getBook(book.id);
@@ -489,6 +504,10 @@ document.addEventListener('drop', (e) => {
 });
 
 /* ————————— Curtain up ————————— */
+
+// Build stamp — lets anyone confirm which edition their browser is running.
+console.info(`Shakespeare v${__APP_VERSION__}`);
+$('#colophon').textContent = `Edition v${__APP_VERSION__}`;
 
 applyTheme();
 syncSettingsUI();
