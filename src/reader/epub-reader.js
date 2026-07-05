@@ -11,19 +11,7 @@ const THEME_COLORS = {
 
 const LOCATIONS_PER = 900; // characters per "location" for the progress scale
 
-function themeRules({ fg, accent }) {
-  return {
-    'html, body': {
-      color: `${fg} !important`,
-      background: 'transparent !important',
-    },
-    'p, li, blockquote, h1, h2, h3, h4, h5, h6, div, span, dd, dt, td, th': {
-      color: 'inherit !important',
-    },
-    a: { color: `${accent} !important` },
-    'img, svg, image': { 'max-width': '100% !important' },
-  };
-}
+const MONO_STACK = 'ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace';
 
 function fontFaceCss() {
   const abs = (u) => new URL(u, document.baseURI).href;
@@ -109,12 +97,9 @@ export class EpubReader {
     const rendition = this.book.renderTo(this.container, renditionOptions(this.settings.layout));
     this.rendition = rendition;
 
-    rendition.themes.register('shx-dark', themeRules(THEME_COLORS.dark));
-    rendition.themes.register('shx-light', themeRules(THEME_COLORS.light));
-    this.applyTextStyles();
-
     rendition.hooks.content.register((contents) => {
       contents.addStylesheetCss(fontFaceCss(), 'shx-fonts');
+      contents.addStylesheetCss(this.contentCss(), 'shx-style');
     });
 
     rendition.on('relocated', (location) => this.handleRelocated(location));
@@ -123,11 +108,38 @@ export class EpubReader {
     await rendition.display(target);
   }
 
+  // One stylesheet, rebuilt from settings and injected under a fixed key so a
+  // re-apply fully replaces the previous version (epub.js's own themes.select
+  // leaves the old theme's stylesheet behind, so toggling breaks — we bypass
+  // it). Publisher styles are overridden wholesale: the reader shows plain
+  // text on the app's background, in the reader's colors, face, and size.
+  contentCss() {
+    const colors = this.settings.theme === 'light' ? THEME_COLORS.light : THEME_COLORS.dark;
+    const stack = FONT_STACKS[this.settings.font] || FONT_STACKS.garamond;
+    return `
+      html, body { background: transparent !important; }
+      body * { background: transparent !important; }
+      body, body > * { border: 0 !important; box-shadow: none !important; outline: 0 !important; }
+      body { color: ${colors.fg} !important; }
+      body * { color: inherit !important; }
+      a[href], a[href] * { color: ${colors.accent} !important; }
+      body, body * { font-family: ${stack} !important; }
+      body pre, body code, body kbd, body samp, body tt,
+      body pre *, body code * { font-family: ${MONO_STACK} !important; }
+      html { font-size: ${this.settings.fontSize}% !important; }
+      body { font-size: 1em !important; line-height: 1.65 !important; }
+      body p, body li, body blockquote, body dd, body dt {
+        font-size: 1em !important;
+        line-height: 1.65 !important;
+      }
+      img, image, svg { max-width: 100% !important; }
+    `;
+  }
+
   applyTextStyles() {
-    const { themes } = this.rendition;
-    themes.select(this.settings.theme === 'light' ? 'shx-light' : 'shx-dark');
-    themes.font(FONT_STACKS[this.settings.font] || FONT_STACKS.garamond);
-    themes.fontSize(`${this.settings.fontSize}%`);
+    for (const contents of this.rendition.getContents()) {
+      contents.addStylesheetCss(this.contentCss(), 'shx-style');
+    }
   }
 
   // Locations give a stable percentage scale across the whole book. Generating
