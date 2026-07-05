@@ -2,7 +2,7 @@
 
 *A quiet reading room in your browser.*
 
-Shakespeare is a local-only browser book reader for **EPUB** and **PDF**
+Shakespeare is a local-only browser book reader for **EPUB** and **PDF**(for now)
 files. Upload a book, read it, close the tab — it remembers where you left
 off. Nothing ever leaves your machine.
 
@@ -10,14 +10,6 @@ off. Nothing ever leaves your machine.
 
 - **EPUB & PDF** — rendered with [epub.js](https://github.com/futurepress/epub.js)
   and [pdf.js](https://mozilla.github.io/pdf.js/)
-- **Reading layouts** — one page, two-page spread, or continuous scroll
-- **Dark & light themes** — PDFs are gently inverted in the dark theme
-  (switchable in Settings)
-- **Text size & style** — Garamond, Georgia, or a sans face, 70–160% size
-  (EPUB only; PDFs keep their print layout)
-- **Table of contents** — collapsible panel on the right of the reader
-- **Progress bar** — a hairline along the bottom; hover it for chapter, page,
-  and percentage, click it to jump
 - **Automatic progress saving** — your position is stored per book in
   `localStorage`, and the books themselves are kept in IndexedDB, so the
   Library lets you reopen anything without re-uploading
@@ -35,12 +27,7 @@ npm run preview   # serve the production build
 The build is fully static — host `dist/` anywhere (or open it from any static
 file server). There is no backend.
 
-## The front-page image
 
-The "image for viewing pleasure" is picked at random on every visit from
-`src/assets/gallery/`. Drop your own images (svg/png/jpg/webp/gif/avif) into
-that folder and they join the rotation automatically; the engraved plates
-that ship with the app are just placeholders.
 
 ## Where things are stored
 
@@ -57,3 +44,12 @@ backend slots in — the rest of the app only talks to them.
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+
+## Inspriation
+
+Main reason for making this is because i needed it and there wasnt any free software that i liked enough to use it, and the other reason is to test new Fable 5.
+Front page gallery - [fiven1](https://fiven1.github.io/web/)
+Design inspiration - [plyght](https://peril.lol/)
+
+Books are best read physically but if you are for any reason not able feel fre to use Shakespeare :),
