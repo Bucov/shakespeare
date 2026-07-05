@@ -490,6 +490,10 @@ document.addEventListener('drop', (e) => {
 
 /* ————————— Curtain up ————————— */
 
+// Build stamp — lets anyone confirm which edition their browser is running.
+console.info(`Shakespeare v${__APP_VERSION__}`);
+$('#colophon').textContent = `Edition v${__APP_VERSION__}`;
+
 applyTheme();
 syncSettingsUI();
 initTocState();

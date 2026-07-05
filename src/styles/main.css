@@ -201,6 +201,19 @@ abbr {
   transition: color 0.25s ease;
 }
 
+/* Printer's colophon — quietly names the edition */
+.home-colophon {
+  position: absolute;
+  right: clamp(1rem, 3vw, 2.5rem);
+  bottom: 0.9rem;
+  font-size: 0.8rem;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  user-select: none;
+  pointer-events: none;
+}
+
 /* Drag-and-drop veil */
 .dropveil {
   position: fixed;

@@ -31,12 +31,19 @@ function fontFaceCss() {
 // html/body element styles are left alone: epub.js writes its pagination
 // (column) styles there.
 function stripPublisherStyles(doc) {
-  for (const node of doc.querySelectorAll('link[rel~="stylesheet"]')) node.remove();
+  for (const node of doc.querySelectorAll('link[rel~="stylesheet"], script')) node.remove();
   for (const node of doc.querySelectorAll('style')) {
     if (!node.id || !node.id.startsWith('epubjs-inserted')) node.remove();
   }
   for (const el of doc.querySelectorAll('body *[style]')) {
     if (!el.closest('svg')) el.removeAttribute('style');
+  }
+  // Inline handlers are dead under the frame sandbox anyway; drop them so the
+  // console stays quiet.
+  for (const el of doc.querySelectorAll('body *')) {
+    for (const attr of [...el.attributes]) {
+      if (attr.name.startsWith('on')) el.removeAttribute(attr.name);
+    }
   }
 }
 
