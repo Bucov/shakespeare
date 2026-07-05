@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500">
+  <g fill="none" stroke="#948d7a" stroke-width="1">
+    <rect x="14" y="14" width="372" height="472" />
+    <rect x="22" y="22" width="356" height="456" opacity="0.45" />
+  </g>
+  <g fill="none" stroke="#948d7a" stroke-width="2">
+    <path d="M128 84 C 118 130 132 180 172 232" />
+    <path d="M128 84 C 158 118 178 176 196 226" />
+    <path d="M128 84 C 146 156 176 240 244 330" />
+    <path d="M139 122 C 132 136 133 148 138 160" opacity="0.7" />
+    <path d="M148 150 C 141 162 142 174 148 186" opacity="0.7" />
+    <path d="M158 178 C 152 190 153 200 160 212" opacity="0.7" />
+    <path d="M150 118 C 158 128 164 140 168 152" opacity="0.7" />
+    <path d="M162 148 C 170 158 175 170 179 182" opacity="0.7" />
+    <path d="M174 180 C 181 190 186 200 189 212" opacity="0.7" />
+    <path d="M244 330 L 254 344 M244 330 L 240 346" />
+  </g>
+  <g fill="none" stroke="#948d7a" stroke-width="2">
+    <ellipse cx="290" cy="342" rx="32" ry="9" />
+    <path d="M258 342 C 254 366 260 382 268 392 L 312 392 C 320 382 326 366 322 342" />
+    <path d="M266 356 Q 290 364 314 356" opacity="0.6" />
+  </g>
+  <g fill="none" stroke="#948d7a" stroke-width="1.6">
+    <path d="M96 424 C 132 404 158 440 198 420 C 226 406 240 428 262 420 C 286 411 300 424 318 418" />
+    <circle cx="330" cy="416" r="2.4" fill="#948d7a" stroke="none" />
+  </g>
+  <text x="200" y="472" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="15" fill="#948d7a">Plate IV &#8212; The Quill</text>
+</svg>
