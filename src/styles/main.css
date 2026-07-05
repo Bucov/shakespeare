@@ -4,6 +4,11 @@
    ———————————————————————————————————————————————— */
 
 :root {
+  /* Pin the color scheme to the app theme (not the OS preference): a
+     mismatch with the book iframe makes browsers paint an opaque white
+     canvas behind it. The iframe declares the same scheme. */
+  color-scheme: dark;
+
   --stack-garamond: "EB Garamond", Garamond, "Palatino Linotype", Palatino, Georgia, serif;
   --stack-georgia: Georgia, "Times New Roman", Times, serif;
   --stack-sans: system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -21,6 +26,8 @@
 }
 
 :root[data-theme="light"] {
+  color-scheme: light;
+
   --bg: #f3eddd;
   --fg: #2b2519;
   --muted: #78705c;
