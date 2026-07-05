@@ -30,7 +30,15 @@ Small buffers uploaded via `page.setInputFiles('#file-input', path)`.
 ## Flows worth driving
 
 - Front page: `.home-title`, `#btn-settings`, `#btn-upload`, gallery image
-  (`#gallery-img` src rotates across reloads), caption text.
+  (`#gallery-img` src rotates across reloads). Caption `#gallery-caption` is a
+  Wikipedia link showing "Title — Artist" from `src/gallery-manifest.js`
+  (keyed by file name; unknown files get prettified-name placeholders) and
+  glows (text-shadow) on hover.
+- EPUB scroll mode: `.epub-container` gets `.shx-scroller` (hidden scrollbar,
+  smooth behavior, overflow-x hidden). Wheeling past the chapter's bottom
+  shows `.scroll-continue` and accumulating ~520px of deltaY turns to the
+  next chapter (dispatch WheelEvent on `.epub-container` after scrolling to
+  its bottom to test).
 - EPUB: upload → wait `#viewer iframe` → `.toc-list button` ×3 → `#nav-next` /
   ArrowRight advances `#progress-pct` → TOC click updates `#progress-label`
   and `.toc-current` → click `#progress-track` seeks.

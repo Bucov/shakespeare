@@ -13,6 +13,9 @@ const LOCATIONS_PER = 900; // characters per "location" for the progress scale
 
 const MONO_STACK = 'ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace';
 
+// Wheel distance to accumulate past the chapter's end before turning over.
+const SCROLL_ADVANCE_THRESHOLD = 520;
+
 function hexToRgb(hex) {
   const n = parseInt(hex.slice(1), 16);
   return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`;
@@ -83,6 +86,9 @@ export class EpubReader {
     this.currentHref = null;
     this.tocFlat = [];
     this.destroyed = false;
+    this.atEnd = false;
+    this._accum = 0;
+    this._advancing = false;
   }
 
   async open(initialPosition) {
@@ -129,6 +135,11 @@ export class EpubReader {
       stripPublisherStyles(contents.document);
       contents.addStylesheetCss(fontFaceCss(), 'shx-fonts');
       contents.addStylesheetCss(this.contentCss(), 'shx-style');
+      // Wheel events over the book land inside its frame; forward them so
+      // scroll mode can sense "kept scrolling past the end".
+      contents.document.addEventListener('wheel', (e) => this.handleWheel(e.deltaY), {
+        passive: true,
+      });
     });
     // Safety net: re-assert reader styling every time a section is shown, in
     // case the content hook misfires in some environment. Idempotent — the
@@ -139,6 +150,80 @@ export class EpubReader {
     rendition.on('keydown', (event) => this.callbacks.onKey?.(event));
 
     await rendition.display(target);
+
+    this.scroller = null;
+    this.continueEl = null;
+    if (this.settings.layout === 'scroll') this.setupScrollExtras();
+  }
+
+  /* ————— Scroll mode: hidden scrollbar, scroll-past-end chapter turn ————— */
+
+  setupScrollExtras() {
+    const scroller = this.container.querySelector('.epub-container');
+    if (!scroller) return;
+    this.scroller = scroller;
+    scroller.classList.add('shx-scroller');
+    scroller.addEventListener('wheel', (e) => this.handleWheel(e.deltaY), { passive: true });
+
+    const overlay = document.createElement('div');
+    overlay.className = 'scroll-continue';
+    overlay.innerHTML =
+      '<span class="scroll-continue-text"></span>' +
+      '<span class="scroll-continue-track"><span class="scroll-continue-fill"></span></span>';
+    this.container.appendChild(overlay);
+    this.continueEl = overlay;
+    this._accum = 0;
+  }
+
+  handleWheel(deltaY) {
+    if (this.settings.layout !== 'scroll' || !this.scroller || this._advancing) return;
+    const s = this.scroller;
+    const atBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 6;
+    if (deltaY > 0 && atBottom) {
+      this._accum = Math.min(SCROLL_ADVANCE_THRESHOLD, this._accum + deltaY);
+      this.updateContinueOverlay();
+      clearTimeout(this._continueTimer);
+      this._continueTimer = setTimeout(() => this.resetContinue(), 1200);
+      if (!this.atEnd && this._accum >= SCROLL_ADVANCE_THRESHOLD) this.advanceChapter();
+    } else if (this._accum) {
+      this.resetContinue();
+    }
+  }
+
+  updateContinueOverlay() {
+    const el = this.continueEl;
+    if (!el) return;
+    el.querySelector('.scroll-continue-text').textContent = this.atEnd
+      ? 'Finis ❦'
+      : 'Chapter’s end — keep scrolling ❧';
+    el.querySelector('.scroll-continue-fill').style.width = this.atEnd
+      ? '100%'
+      : `${Math.round((this._accum / SCROLL_ADVANCE_THRESHOLD) * 100)}%`;
+    el.classList.add('visible');
+  }
+
+  resetContinue() {
+    clearTimeout(this._continueTimer);
+    this._accum = 0;
+    if (this.continueEl) {
+      this.continueEl.classList.remove('visible');
+      this.continueEl.querySelector('.scroll-continue-fill').style.width = '0%';
+    }
+  }
+
+  async advanceChapter() {
+    this._advancing = true;
+    this.resetContinue();
+    this.container.classList.add('shx-chapter-turn');
+    try {
+      await this.rendition.next();
+      this.scroller?.scrollTo({ top: 0, behavior: 'instant' });
+    } finally {
+      setTimeout(() => {
+        this.container.classList.remove('shx-chapter-turn');
+        this._advancing = false;
+      }, 450);
+    }
   }
 
   // One stylesheet, rebuilt from settings and injected under a fixed key so a
@@ -257,6 +342,7 @@ export class EpubReader {
   handleRelocated(location) {
     this.currentCfi = location.start.cfi;
     this.currentHref = location.start.href;
+    this.atEnd = !!location.atEnd;
     this.emitProgress();
     this.scheduleStyleCheck();
   }
@@ -325,6 +411,7 @@ export class EpubReader {
   destroy() {
     this.destroyed = true;
     clearTimeout(this._checkTimer);
+    clearTimeout(this._continueTimer);
     try {
       this.rendition?.destroy();
       this.book?.destroy();
