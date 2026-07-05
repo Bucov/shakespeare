@@ -447,12 +447,18 @@ abbr {
   padding: 1.25rem clamp(2.5rem, 5vw, 4.5rem) 1.5rem;
 }
 
-/* EPUB scroll mode gets a comfortable measure */
-.reader[data-layout="scroll"][data-kind="epub"] #viewer {
+/* EPUB text gets a comfortable measure: single pages would otherwise span
+   the whole window. Two-page spreads keep the full width. */
+.reader[data-layout="scroll"][data-kind="epub"] #viewer,
+.reader[data-layout="single"][data-kind="epub"] #viewer {
   max-width: 52rem;
   margin: 0 auto;
   position: relative;
   height: 100%;
+}
+
+.reader[data-layout="single"][data-kind="epub"] #viewer {
+  max-width: 40rem;
 }
 
 /* PDF canvases */

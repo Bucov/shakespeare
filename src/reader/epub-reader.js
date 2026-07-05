@@ -25,6 +25,21 @@ function fontFaceCss() {
   `;
 }
 
+// Remove the book's own styling so chapters render as plain text under the
+// reader's stylesheet alone — no publisher CSS can fight the theme. Inline
+// styles are dropped too, except inside SVG (where they draw the artwork).
+// html/body element styles are left alone: epub.js writes its pagination
+// (column) styles there.
+function stripPublisherStyles(doc) {
+  for (const node of doc.querySelectorAll('link[rel~="stylesheet"]')) node.remove();
+  for (const node of doc.querySelectorAll('style')) {
+    if (!node.id || !node.id.startsWith('epubjs-inserted')) node.remove();
+  }
+  for (const el of doc.querySelectorAll('body *[style]')) {
+    if (!el.closest('svg')) el.removeAttribute('style');
+  }
+}
+
 function renditionOptions(layout) {
   const base = { width: '100%', height: '100%', allowScriptedContent: false };
   switch (layout) {
@@ -98,6 +113,7 @@ export class EpubReader {
     this.rendition = rendition;
 
     rendition.hooks.content.register((contents) => {
+      stripPublisherStyles(contents.document);
       contents.addStylesheetCss(fontFaceCss(), 'shx-fonts');
       contents.addStylesheetCss(this.contentCss(), 'shx-style');
     });
