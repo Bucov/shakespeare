@@ -53,6 +53,14 @@ Small buffers uploaded via `page.setInputFiles('#file-input', path)`.
   wait for `#library-list li`, don't count immediately.
 - epub.js locations generation takes ~1s after open; percentages are blank
   until then.
+- Don't use epub.js `themes.select()` for styling: it never removes the
+  previously injected theme stylesheet, so toggling silently breaks. EPUB
+  styling lives in `contentCss()` (epub-reader.js), one keyed stylesheet
+  re-injected via `contents.addStylesheetCss` on every settings change; it
+  deliberately overrides publisher colors/backgrounds/fonts wholesale. Verify
+  with a hostile fixture (publisher page-box div + px sizes + own colors) by
+  reading computed styles inside `#viewer iframe`, including a
+  dark→light→dark round trip.
 - The giant home title must keep `pointer-events: none` or it eats clicks on
   the links above it (its line box is far taller than the glyphs).
 - Switching EPUB layout through scroll mode can coarsen the saved position to
