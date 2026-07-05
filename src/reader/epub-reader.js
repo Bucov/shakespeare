@@ -147,9 +147,11 @@ export class EpubReader {
   // it). Publisher styles are overridden wholesale: the reader shows plain
   // text on the app's background, in the reader's colors, face, and size.
   contentCss() {
+    const scheme = this.settings.theme === 'light' ? 'light' : 'dark';
     const colors = this.settings.theme === 'light' ? THEME_COLORS.light : THEME_COLORS.dark;
     const stack = FONT_STACKS[this.settings.font] || FONT_STACKS.garamond;
     return `
+      html { color-scheme: ${scheme}; }
       html, body { background: transparent !important; }
       body * { background: transparent !important; }
       body, body > * { border: 0 !important; box-shadow: none !important; outline: 0 !important; }
@@ -202,8 +204,16 @@ export class EpubReader {
         ).length,
         sandbox: iframe?.getAttribute('sandbox') ?? '(none)',
         srcdoc: !!iframe?.hasAttribute('srcdoc'),
+        // Must match the app theme, or the browser backs the frame with an
+        // opaque white canvas (the "white page box" bug under OS dark mode).
+        frameScheme: doc.defaultView.getComputedStyle(doc.documentElement).colorScheme,
+        appScheme: getComputedStyle(document.documentElement).colorScheme,
       };
-      info.ok = info.actual === expected && info.styleNode > 0 && info.leftoverSheets === 0;
+      info.ok =
+        info.actual === expected &&
+        info.styleNode > 0 &&
+        info.leftoverSheets === 0 &&
+        info.frameScheme === info.appScheme;
       console.info('[shakespeare] epub style check:', JSON.stringify(info));
       return info;
     } catch (err) {

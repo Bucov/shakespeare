@@ -66,3 +66,10 @@ Small buffers uploaded via `page.setInputFiles('#file-input', path)`.
 - Switching EPUB layout through scroll mode can coarsen the saved position to
   the chapter start — chapter-level resume is the guarantee there, not
   paragraph-level.
+- ALWAYS test EPUB rendering under `colorScheme: 'dark'` context emulation as
+  well as the default: if the app's color-scheme and the book iframe's
+  color-scheme ever mismatch, browsers back the frame with an opaque white
+  canvas (invisible to computed-style checks — only screenshots/pixels show
+  it). Both sides pin their scheme (`:root` in main.css, `html { color-scheme }`
+  in `contentCss()`), and the `[shakespeare] epub style check` console line
+  reports `frameScheme`/`appScheme`.
