@@ -1,10 +1,5 @@
 // Metadata for the front-page gallery.
-//
-// Keys are file names inside src/assets/gallery/ (extension included).
-// Every image dropped into that folder joins the rotation automatically;
-// give it an entry here to show its proper title, artist, and Wikipedia
-// link. Images without an entry fall back to a prettified file name and a
-// Wikipedia search link — replace those placeholders whenever you like.
+
 
 export const GALLERY_INFO = {
   '250px-Vincent_Willem_van_Gogh_-_Cafe_Terrace_at_Night_(Yorck).jpg': {
@@ -103,7 +98,7 @@ export const GALLERY_INFO = {
     wiki: 'https://en.wikipedia.org/wiki/Peter_Paul_Rubens',
   },
   'Shakespeare, William.png': {
-    title: 'William Shakespeare', // placeholder — name the exact portrait if you know it
+    title: 'William Shakespeare',
     artist: 'Artist unknown',
     wiki: 'https://en.wikipedia.org/wiki/William_Shakespeare',
   },
