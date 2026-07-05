@@ -13,6 +13,11 @@ const LOCATIONS_PER = 900; // characters per "location" for the progress scale
 
 const MONO_STACK = 'ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace';
 
+function hexToRgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`;
+}
+
 function fontFaceCss() {
   const abs = (u) => new URL(u, document.baseURI).href;
   return `
@@ -96,6 +101,7 @@ export class EpubReader {
 
     await this.renderRendition(initialPosition?.cfi || undefined);
     this.prepareLocations();
+    this.scheduleStyleCheck();
   }
 
   mapTocItem(item) {
@@ -124,6 +130,10 @@ export class EpubReader {
       contents.addStylesheetCss(fontFaceCss(), 'shx-fonts');
       contents.addStylesheetCss(this.contentCss(), 'shx-style');
     });
+    // Safety net: re-assert reader styling every time a section is shown, in
+    // case the content hook misfires in some environment. Idempotent — the
+    // keyed style node is simply replaced.
+    rendition.on('rendered', () => this.applyTextStyles());
 
     rendition.on('relocated', (location) => this.handleRelocated(location));
     rendition.on('keydown', (event) => this.callbacks.onKey?.(event));
@@ -161,8 +171,58 @@ export class EpubReader {
 
   applyTextStyles() {
     for (const contents of this.rendition.getContents()) {
+      stripPublisherStyles(contents.document);
       contents.addStylesheetCss(this.contentCss(), 'shx-style');
     }
+  }
+
+  // Inspect the rendered chapter and report whether the reader's styling
+  // actually took effect. Logged to the console so problems on machines we
+  // can't reach are diagnosable; if the check fails, styling is re-applied.
+  styleCheck() {
+    try {
+      const contents = this.rendition?.getContents()?.[0];
+      const doc = contents?.document;
+      if (!doc || !doc.defaultView) return null;
+      const probe = doc.querySelector('p') || doc.querySelector('h1, div');
+      const expected = hexToRgb(
+        (this.settings.theme === 'light' ? THEME_COLORS.light : THEME_COLORS.dark).fg,
+      );
+      const styleNode = doc.getElementById('epubjs-inserted-css-shx-style');
+      const iframe = this.container.querySelector('iframe');
+      const info = {
+        version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '?',
+        theme: this.settings.theme,
+        expected,
+        actual: probe ? doc.defaultView.getComputedStyle(probe).color : '(no text element)',
+        font: probe ? doc.defaultView.getComputedStyle(probe).fontFamily.split(',')[0] : '',
+        styleNode: styleNode ? styleNode.textContent.length : 0,
+        leftoverSheets: doc.querySelectorAll(
+          'link[rel~="stylesheet"], style:not([id^="epubjs-inserted"])',
+        ).length,
+        sandbox: iframe?.getAttribute('sandbox') ?? '(none)',
+        srcdoc: !!iframe?.hasAttribute('srcdoc'),
+      };
+      info.ok = info.actual === expected && info.styleNode > 0 && info.leftoverSheets === 0;
+      console.info('[shakespeare] epub style check:', JSON.stringify(info));
+      return info;
+    } catch (err) {
+      console.warn('[shakespeare] epub style check failed:', err);
+      return null;
+    }
+  }
+
+  scheduleStyleCheck() {
+    clearTimeout(this._checkTimer);
+    this._checkTimer = setTimeout(() => {
+      if (this.destroyed) return;
+      const info = this.styleCheck();
+      if (info && !info.ok) {
+        console.warn('[shakespeare] reader styles missing — re-applying');
+        this.applyTextStyles();
+        setTimeout(() => !this.destroyed && this.styleCheck(), 600);
+      }
+    }, 900);
   }
 
   // Locations give a stable percentage scale across the whole book. Generating
@@ -188,6 +248,7 @@ export class EpubReader {
     this.currentCfi = location.start.cfi;
     this.currentHref = location.start.href;
     this.emitProgress();
+    this.scheduleStyleCheck();
   }
 
   emitProgress() {
@@ -253,6 +314,7 @@ export class EpubReader {
 
   destroy() {
     this.destroyed = true;
+    clearTimeout(this._checkTimer);
     try {
       this.rendition?.destroy();
       this.book?.destroy();
