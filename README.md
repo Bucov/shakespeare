@@ -52,4 +52,4 @@ Main reason for making this is because i needed it and there wasnt any free soft
 Front page gallery - [fiven1](https://fiven1.github.io/web/)
 Design inspiration - [plyght](https://peril.lol/)
 
-Books are best read physically but if you are for any reason not able feel fre to use Shakespeare :),
+Books are best read physically but if you are for any reason not able feel free to use Shakespeare :),
